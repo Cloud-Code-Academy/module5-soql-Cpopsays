@@ -47,6 +47,13 @@ public with sharing class SOQL {
     //  The body of the method
     //}
 
+    public static List<Contact> getContacts(){
+    //body of the method
+    List<Contact> contactList = new List<Contact> ([SELECT Id, Name, FirstName FROM Contact WHERE FirstName = 'John']);
+    return contactList;
+
+    }
+
     /**
      * Question 3
      * Update/Uncomment the template code to create a method
