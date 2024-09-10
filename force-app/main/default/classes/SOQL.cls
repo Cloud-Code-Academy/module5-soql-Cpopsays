@@ -49,7 +49,7 @@ public with sharing class SOQL {
 
     public static List<Contact> getContacts(){
     //body of the method
-    List<Contact> contactList = new List<Contact> ([SELECT Id, Name, FirstName FROM Contact WHERE FirstName = 'John']);
+    List<Contact> contactList = new List<Contact>([SELECT Id, Name, FirstName FROM Contact WHERE FirstName = 'John']);
     return contactList;
 
     }
@@ -64,6 +64,14 @@ public with sharing class SOQL {
     //[public | private ] [static] data_type method_name (input parameters) {
     //  The body of the method
     //}
+
+    public static List<Id> getContactIds(){
+
+        List<Id> contactIdList = new List<Id>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
+        return contactIdList;
+
+    }    
+    
 
     /**
      * Question 4
