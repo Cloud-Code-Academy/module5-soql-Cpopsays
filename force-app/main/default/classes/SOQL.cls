@@ -65,10 +65,14 @@ public with sharing class SOQL {
     //  The body of the method
     //}
 
-    public static List<Id> getContactIds(){
-
-        List<Id> contactIdList = new List<Id>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
-        return contactIdList;
+    public static Set<Id> getContactIds(){
+        //maybe it wil lbe a list of contacts then iteration loop to add the ids to a set of ids make sure method accepts set of ids
+        List<Contacts> contactIdList = new List<Contact>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
+        Set<Id> contactIdSet = new Set<Id>();
+        for (Contact contact : contactIdList) {
+            //get the id of each element in the list and add to the set of Ids
+        }
+        return contactIdSet;
 
     }    
     
