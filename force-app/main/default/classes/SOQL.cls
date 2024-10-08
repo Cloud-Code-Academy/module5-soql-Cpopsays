@@ -146,9 +146,13 @@ public with sharing class SOQL {
      * @return A list of Contact records.
      * Update the corresponding test class and testGetContactsByEmailDomain method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+    
+     public static List<Contact> contactsByDomain (){
+        //iniialize a list and assign results of soql query to list
+        //id, email from contact where email like %domain
+        List<Contact> listContactsByDomain = [SELECT Id, Email, Name FROM Contact WHERE Email LIKE '%@example.com'];
+        return listContactsByDomain;
+     }
 
     /**
      * Question 8
