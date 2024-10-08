@@ -121,9 +121,23 @@ public with sharing class SOQL {
      * @return A map of Task Ids to Task records.
      * Update the corresponding test class and testGetTasksDueNextWeek method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+
+     public static Map<Id, Task> taskGetDueNextWeek (){
+        //create a list of tasks to hold the result soql query tasks due in next 7 days
+        //https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_dateformats.htm
+        List<Task> listTasks = [SELECT Id, ActivityDate FROM Task WHERE ActivityDate = NEXT_N_DAYS:7];
+        //initialize new map map<id, task>
+        Map<Id, Task> taskMap = new Map<Id, Task>();
+        //loop over the results in the list and add each element id, task to the map
+        for (Task t : listTasks) {
+            taskMap.put(t.Id, t);
+        }
+        //outside loop return the map
+        return taskMap;
+     }
+
+    
+
 
     /**
      * Question 7
