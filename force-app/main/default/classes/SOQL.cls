@@ -66,13 +66,18 @@ public with sharing class SOQL {
     //}
 
     public static Set<Id> getContactIds(){
-        //maybe it wil lbe a list of contacts then iteration loop to add the ids to a set of ids make sure method accepts set of ids
-        List<Contacts> contactIdList = new List<Contact>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
-        Set<Id> contactIdSet = new Set<Id>();
-        for (Contact contact : contactIdList) {
-            //get the id of each element in the list and add to the set of Ids
+        //get the contacts with a soql query
+        List<Contact> contactList = new List<Contact>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
+        //list of Ids
+        Set<Id> IdSet = new Set<Id>();
+
+        //get each contact ID and add to list of Ids
+        for (Contact contact : contactList) {
+            IdSet.add(contact.Id);
+
         }
-        return contactIdSet;
+
+        return IdSet;
 
     }    
     
@@ -86,9 +91,15 @@ public with sharing class SOQL {
      * @return A list of Opportunities with important opportunities fields
      * Update the corresponding test class and testGetClosedWonOpportunityCountByAccount method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+ 
+
+    public static List<Opportunity> ClosedWonOpps(String accountId) {
+        //list to hold closed won opps
+        List<Opportunity> oppList = [SELECT Id, Name, AccountId, CloseDate, Amount, StageName FROM Opportunity 
+        WHERE AccountId = :accountId AND StageName = 'Closed Won'];
+        return oppList;
+
+    }
 
     /**
      * Question 5
