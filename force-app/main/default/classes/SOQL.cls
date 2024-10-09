@@ -173,7 +173,10 @@ public with sharing class SOQL {
      * @return A list of Case records.
      */
     public static List<Case> getFilterCaseOrigins() {
-        return null; // Replace null with the variable you used to store the result
+        //initialize the list and assign results of query. I tried to use "not" but it prompted me to put "not in" which was new for me. 
+        //https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_comparisonoperators.htm
+        List<Case> caseByOrigin = [SELECT Id, Origin FROM Case WHERE Origin NOT IN ('Email','Web','')];
+        return caseByOrigin; // Replace null with the variable you used to store the result
     }
 
     /**
