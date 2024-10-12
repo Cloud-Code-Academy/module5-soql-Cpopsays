@@ -226,6 +226,8 @@ public with sharing class SOQL {
      */
     public static Decimal getTotalRevenueByStage(String stage) {
         // Use AggregateQuery to get the total revenue
+        //*Would there be a reason to place the aggregate funcito within a group by clause? 
+        //*https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_agg_functions.htm
         AggregateResult revenueResult = [SELECT SUM(Amount) total FROM Opportunity WHERE StageName = :stage OR Amount > 10000];
         // Return the total revenue
         Decimal revenue;
@@ -239,7 +241,8 @@ public with sharing class SOQL {
      * @return A list of the first 10 Accounts ordered by Name.
      */
     public static List<Account> getFirstTenAccounts() {
-        return null; // Replace null with the variable you used to store the result
+        List<Account> tenAccounts = [SELECT Name, Id FROM Account LIMIT 10];
+        return tenAccounts; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -248,7 +251,8 @@ public with sharing class SOQL {
      * @return A list of Opportunities with an Amount greater than 100,000, ordered by CloseDate, and limited to 5 records.
      */
     public static List<Opportunity> getHighValueOpportunities() {
-        return null; // Replace null with the variable you used to store the result
+        List<Opportunity> bigOppList = [SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE Amount > 100000 ORDER BY CloseDate LIMIT 5];
+        return bigOppList; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -257,7 +261,11 @@ public with sharing class SOQL {
      * @return A list of Contacts
      */
     public static List<Contact> getBirthdateContacts() {
-        return null; // Replace null with the variable you used to store the result
+        //at first I sorted ASC thinking it would return the 3 most recent dates but didnt pass, realized it returns 3 oldest
+        //then realized desc will result in first three result being most recent dates
+        //I have a hard time conceptualizing dates with comparison operators and sorting, need to practice this
+        List<Contact> contactsByBirthdate = [SELECT Id, Name, Birthdate FROM Contact ORDER BY Birthdate DESC LIMIT 3]; 
+        return contactsByBirthdate; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -266,7 +274,8 @@ public with sharing class SOQL {
      * @return A list of Cases
      */
     public static List<Case> getCasesWithStatus() {
-        return null; // Replace null with the variable you used to store the result
+        List<Case> openCases = [SELECT Id, Status, CreatedDate, Origin FROM Case WHERE Status = 'Open' LIMIT 10 OFFSET 5];
+        return openCases; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -278,14 +287,16 @@ public with sharing class SOQL {
      */
     public static Set<Id> getCaseIdsByAccount(Id accountId) {
         // Create a set to hold the Case Ids
-
+        Set<Id> caseIds = new Set<Id>();
         // Query the Cases
+        List<Case> idList = [SELECT Id FROM Case WHERE AccountId = :accountId];
         // Loop through each Case and add the Id to the set
-        //for () {
-        //    
-        //}
+        for (Case c : idList) {
+            caseIds.add(c.Id);
+        }
 
-        return null; // Replace null with the variable you used to store the result
+
+        return caseIds; // Replace null with the variable you used to store the result
     }
 
     /**
