@@ -311,9 +311,12 @@ public with sharing class SOQL {
         Map<Id, String> accountIdsToNames = new Map<Id, String>();
 
         // Query the Accounts
+        List<Account> accountNames = [SELECT Id, Name, BillingCountry FROM Account WHERE BillingCountry <> :country];
         // Loop through each Account and add the Id and Name to the map
-
-        return null; // Replace null with the variable you used to store the result
+        for (Account a : accountNames){
+            accountIdsToNames.put(a.Id, a.Name);
+        }
+        return accountIdsToNames; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -324,8 +327,16 @@ public with sharing class SOQL {
      * @return The Account Name of the Contact.
      */
     public static String getAccountNameForContact(String contactId) {
-        return null; // Replace null with the variable you used to store the result
-    }    
+        
+        //*this doesnt make sense. we anticipate one record as result of query but adding to a list.  
+        
+        //get the contacts related to specific acct and add to list
+        List<Contact> contacts = [SELECT Id, Account.Name FROM Contact WHERE Id = :contactId];
+        //return first element from list account.name
+        //i tried to do a null check but got error about missing return statement type string
+        return contacts[0].Account.Name;
+        
+    }
 
     /**
      * Question 20
