@@ -16,7 +16,7 @@
 * Users of this class can expect to gain a solid understanding of SOQL in Apex and
 * be prepared to handle data retrieval tasks in Salesforce development.
 * 
-* @author Your Name
+* @author Catherine Popovich
 */
 
 public with sharing class SOQL {
@@ -28,9 +28,13 @@ public with sharing class SOQL {
      * @return List of all leads with Id, LastName, Company, Phone, Email
      * Update the corresponding test class and testGetAllLeads method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
+    //[public | private ] [static] data_type method_name (input parameters)
+    public static List<Lead> getLeads() {
     //  The body of the method
-    //}
+        List<Lead> leadList = new List<Lead> ([SELECT Id, LastName, Company, Phone, Email FROM Lead]);
+        return leadList;
+    
+    }
 
     /**
      * Question 2
@@ -43,6 +47,13 @@ public with sharing class SOQL {
     //  The body of the method
     //}
 
+    public static List<Contact> getContacts(){
+    //body of the method
+    List<Contact> contactList = new List<Contact>([SELECT Id, Name, FirstName FROM Contact WHERE FirstName = 'John']);
+    return contactList;
+
+    }
+
     /**
      * Question 3
      * Update/Uncomment the template code to create a method
@@ -54,6 +65,23 @@ public with sharing class SOQL {
     //  The body of the method
     //}
 
+    public static Set<Id> getContactIds(){
+        //get the contacts with a soql query
+        List<Contact> contactList = new List<Contact>([SELECT Id, Name, LastName FROM Contact WHERE LastName = 'Smith' OR LastName = 'Jones']);
+        //list of Ids
+        Set<Id> IdSet = new Set<Id>();
+
+        //get each contact ID and add to list of Ids
+        for (Contact contact : contactList) {
+            IdSet.add(contact.Id);
+
+        }
+
+        return IdSet;
+
+    }    
+    
+
     /**
      * Question 4
      * Update/Uncomment the template code to create a method
@@ -63,9 +91,15 @@ public with sharing class SOQL {
      * @return A list of Opportunities with important opportunities fields
      * Update the corresponding test class and testGetClosedWonOpportunityCountByAccount method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+ 
+
+    public static List<Opportunity> ClosedWonOpps(String accountId) {
+        //list to hold closed won opps
+        List<Opportunity> oppList = [SELECT Id, Name, AccountId, CloseDate, Amount, StageName FROM Opportunity 
+        WHERE AccountId = :accountId AND StageName = 'Closed Won'];
+        return oppList;
+
+    }
 
     /**
      * Question 5
@@ -74,9 +108,11 @@ public with sharing class SOQL {
      * @return The Integer count of Account records.
      * Update the corresponding test class and testGetAccountCount method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+    
+     public static Integer accountGetCount(){
+        Integer accountCount = [SELECT COUNT() FROM Account];
+        return accountCount;
+    }
 
     /**
      * Question 6
@@ -85,9 +121,23 @@ public with sharing class SOQL {
      * @return A map of Task Ids to Task records.
      * Update the corresponding test class and testGetTasksDueNextWeek method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+
+     public static Map<Id, Task> taskGetDueNextWeek (){
+        //create a list of tasks to hold the result soql query tasks due in next 7 days
+        //https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_dateformats.htm
+        List<Task> listTasks = [SELECT Id, ActivityDate FROM Task WHERE ActivityDate = NEXT_N_DAYS:7];
+        //initialize new map map<id, task>
+        Map<Id, Task> taskMap = new Map<Id, Task>();
+        //loop over the results in the list and add each element id, task to the map
+        for (Task t : listTasks) {
+            taskMap.put(t.Id, t);
+        }
+        //outside loop return the map
+        return taskMap;
+     }
+
+    
+
 
     /**
      * Question 7
@@ -96,9 +146,13 @@ public with sharing class SOQL {
      * @return A list of Contact records.
      * Update the corresponding test class and testGetContactsByEmailDomain method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+    
+     public static List<Contact> contactsByDomain (){
+        //iniialize a list and assign results of soql query to list
+        //id, email from contact where email like %domain
+        List<Contact> listContactsByDomain = [SELECT Id, Email, Name FROM Contact WHERE Email LIKE '%@example.com'];
+        return listContactsByDomain;
+     }
 
     /**
      * Question 8
@@ -108,7 +162,9 @@ public with sharing class SOQL {
      * @return A list of Opportunity records.
      */
     public static List<Opportunity> getOpportunitiesByNameKeyword(String keyword) {
-        return null; // Replace null with the variable you used to store the result
+       
+        List<Opportunity> listOppsByName = [SELECT Id, Name FROM Opportunity WHERE Name LIKE : ('%' + keyword + '%')];
+        return listOppsByName; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -117,7 +173,10 @@ public with sharing class SOQL {
      * @return A list of Case records.
      */
     public static List<Case> getFilterCaseOrigins() {
-        return null; // Replace null with the variable you used to store the result
+        //initialize the list and assign results of query. I tried to use "not" but it prompted me to put "not in" which was new for me. 
+        //https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_comparisonoperators.htm
+        List<Case> caseByOrigin = [SELECT Id, Origin FROM Case WHERE Origin NOT IN ('Email','Web','')];
+        return caseByOrigin; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -130,9 +189,12 @@ public with sharing class SOQL {
      * @return A list of Lead records.
      * Update the corresponding test class and testGetLeadsBySourceOrTitle method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}    
+    
+    public static List<Lead> getLeadsBySourceOrTitle(String leadSource, String keyword){
+        List<Lead> leadsBySourceOrTitle = [SELECT Id, LeadSource, Title, LastName, Company, Phone, Email FROM Lead WHERE (LeadSource = 'Web') OR (Title LIKE '%Engineer%') ];
+        return leadsBySourceOrTitle;
+    } 
+
 
     /**
      * Question 11
@@ -143,15 +205,16 @@ public with sharing class SOQL {
      */
     public static List<String> getContactNamesByAccount(Id accountId) {
         // Create a list to hold the Contact LastNames
-
+        List<String> contactLastNames = new List<String>();
         // Query the Contacts
+        List<Contact> contacts = [SELECT Id, AccountId, LastName FROM Contact WHERE AccountId = :accountId];
         // Loop through each Contact and add the LastName to the list
-        //for () {
-        //    
-        //}
+        for (Contact c : contacts) {
+           contactLastNames.add(c.LastName);
+        }
 
         // Return the list of Contact LastNames
-        return null; // Replace null with the variable you used to store the result
+        return contactLastNames; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -163,9 +226,13 @@ public with sharing class SOQL {
      */
     public static Decimal getTotalRevenueByStage(String stage) {
         // Use AggregateQuery to get the total revenue
-
+        //*Would there be a reason to place the aggregate funcito within a group by clause? 
+        //*https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_agg_functions.htm
+        AggregateResult revenueResult = [SELECT SUM(Amount) total FROM Opportunity WHERE StageName = :stage OR Amount > 10000];
         // Return the total revenue
-        return null; // Replace null with the variable you used to store the result
+        Decimal revenue;
+        revenue = (Decimal)revenueResult.get('total');
+        return revenue; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -174,7 +241,8 @@ public with sharing class SOQL {
      * @return A list of the first 10 Accounts ordered by Name.
      */
     public static List<Account> getFirstTenAccounts() {
-        return null; // Replace null with the variable you used to store the result
+        List<Account> tenAccounts = [SELECT Name, Id FROM Account LIMIT 10];
+        return tenAccounts; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -183,7 +251,8 @@ public with sharing class SOQL {
      * @return A list of Opportunities with an Amount greater than 100,000, ordered by CloseDate, and limited to 5 records.
      */
     public static List<Opportunity> getHighValueOpportunities() {
-        return null; // Replace null with the variable you used to store the result
+        List<Opportunity> bigOppList = [SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE Amount > 100000 ORDER BY CloseDate LIMIT 5];
+        return bigOppList; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -192,7 +261,11 @@ public with sharing class SOQL {
      * @return A list of Contacts
      */
     public static List<Contact> getBirthdateContacts() {
-        return null; // Replace null with the variable you used to store the result
+        //at first I sorted ASC thinking it would return the 3 most recent dates but didnt pass, realized it returns 3 oldest
+        //then realized desc will result in first three result being most recent dates
+        //I have a hard time conceptualizing dates with comparison operators and sorting, need to practice this
+        List<Contact> contactsByBirthdate = [SELECT Id, Name, Birthdate FROM Contact ORDER BY Birthdate DESC LIMIT 3]; 
+        return contactsByBirthdate; // Replace null with the variable you used to store the result
     }
     
     /**
@@ -201,7 +274,8 @@ public with sharing class SOQL {
      * @return A list of Cases
      */
     public static List<Case> getCasesWithStatus() {
-        return null; // Replace null with the variable you used to store the result
+        List<Case> openCases = [SELECT Id, Status, CreatedDate, Origin FROM Case WHERE Status = 'Open' LIMIT 10 OFFSET 5];
+        return openCases; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -213,14 +287,16 @@ public with sharing class SOQL {
      */
     public static Set<Id> getCaseIdsByAccount(Id accountId) {
         // Create a set to hold the Case Ids
-
+        Set<Id> caseIds = new Set<Id>();
         // Query the Cases
+        List<Case> idList = [SELECT Id FROM Case WHERE AccountId = :accountId];
         // Loop through each Case and add the Id to the set
-        //for () {
-        //    
-        //}
+        for (Case c : idList) {
+            caseIds.add(c.Id);
+        }
 
-        return null; // Replace null with the variable you used to store the result
+
+        return caseIds; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -235,9 +311,12 @@ public with sharing class SOQL {
         Map<Id, String> accountIdsToNames = new Map<Id, String>();
 
         // Query the Accounts
+        List<Account> accountNames = [SELECT Id, Name, BillingCountry FROM Account WHERE BillingCountry <> :country];
         // Loop through each Account and add the Id and Name to the map
-
-        return null; // Replace null with the variable you used to store the result
+        for (Account a : accountNames){
+            accountIdsToNames.put(a.Id, a.Name);
+        }
+        return accountIdsToNames; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -248,8 +327,16 @@ public with sharing class SOQL {
      * @return The Account Name of the Contact.
      */
     public static String getAccountNameForContact(String contactId) {
-        return null; // Replace null with the variable you used to store the result
-    }    
+        
+        //*this doesnt make sense. we anticipate one record as result of query but adding to a list.  
+        
+        //get the contacts related to specific acct and add to list
+        List<Contact> contacts = [SELECT Id, Account.Name FROM Contact WHERE Id = :contactId];
+        //return first element from list account.name
+        //i tried to do a null check but got error about missing return statement type string
+        return contacts[0].Account.Name;
+        
+    }
 
     /**
      * Question 20
