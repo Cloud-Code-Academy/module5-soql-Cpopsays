@@ -346,7 +346,8 @@ public with sharing class SOQL {
      * @return An Account record with related Opportunities.
      */
     public static Account getAccountAndOpportunitiesFromAccountId(Id accountId) {
-        return null; // Replace null with the variable you used to store the result
+        Account accountWithOpps = [SELECT Name, Id, (SELECT Name FROM Opportunities) FROM Account WHERE Id = :accountId];
+        return accountWithOpps; // Replace null with the variable you used to store the result
     }
 
     /**
@@ -358,15 +359,16 @@ public with sharing class SOQL {
      */
     public static List<Contact> getAccountsWithContactsByState(Id accountId) {
         // Query the Account
-
+        Account singleAccount = [SELECT Id, BillingState FROM Account WHERE Id = :accountId];
         // Store the Account's BillingState
-
+        String accountBillingState = singleAccount.BillingState;
         // Query the Contacts
-        return null; // Replace null with the variable you used to store the result
+        List<Contact> contactsWithSameState = [SELECT Id, MailingState FROM CONTACT WHERE MailingState = :accountBillingState];
+        return contactsWithSameState; // Replace null with the variable you used to store the result
     }
 
     /**
-     * Question 22
+     * Question 22 --> get more practice with this: loop thru elements in a list, check a list to see if it contains (element) and if yes add to another list 
      * Extracts email domains from them leads, then finds Accounts with matching website domains
      * If Lead Email = test@test.com return account with website = www.test.com
      * Example: findAccountsByLeadEmailDomains([set of lead ids]) should return a list of Accounts with matching email domains
@@ -375,20 +377,23 @@ public with sharing class SOQL {
      */
     public static List<Account> findAccountsByLeadEmailDomains(Set<Id> leadIds) {
         // Query the Leads
-
+        List<Lead> leads = [SELECT Email FROM Lead WHERE Id in :leadIds];
+        
         // Create a set of email domains from the Leads
+        Set<String> leadDomains = new Set<String>();
 
         // Loop through each Lead
-
             // Get the email from the Lead
-
             // Check if the email is not null
-
                 // Add the email domain to the set
-
+        for (Lead lead : leads) {
+            if (String.isNotBlank(lead.Email)){
+                leadDomains.add('www.' + lead.Email.split('@')[1].toLowerCase());
+            }
+        }
         
         // Query the Accounts
-        return null; // Replace null with the variable you used to store the result
+        return [SELECT Id, Website FROM Account WHERE Website IN :leadDomains]; // Replace null with the variable you used to store the result
     }
 
     /**
